@@ -12,14 +12,17 @@ namespace RuzinLines
 {
     public partial class Form1 : Form
     {
-        Graphics gr;
         Board board;
         Ruzin ruzin;
+        Graphics gr;
+        Bitmap bitmap;
 
         public Form1()
         {
             InitializeComponent();
-            gr = pictureBox1.CreateGraphics();
+            bitmap = new Bitmap(450, 450);
+            pictureBox1.Image = bitmap;
+            gr = Graphics.FromImage(bitmap);
             board = new Board();
             ruzin = new Ruzin(board);
         }
@@ -27,6 +30,7 @@ namespace RuzinLines
         private void button1_Click(object sender, EventArgs e)
         {
             ruzin.DrawFirst(gr);
+            pictureBox1.Refresh();
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -34,6 +38,7 @@ namespace RuzinLines
             MouseEventArgs newE = e as MouseEventArgs;
             board.checkClick(new Point(newE.X, newE.Y));
             ruzin.Draw(gr);
+            pictureBox1.Refresh();
         }
     }
 }

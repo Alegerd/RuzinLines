@@ -18,10 +18,11 @@ namespace RuzinLines
         Ball choosenBall;
         EmptyCell choosenCell;
         bool theBallIsChoosen;
+        public List<EmptyCell> EmptyCells = new List<EmptyCell>();
+        Random rnd = new Random();
 
-        private Color RandomColor()
+        public Color RandomColor()
         {
-            Random rnd = new Random();
             int randomNum = rnd.Next(4);
             switch (randomNum)
             {
@@ -35,6 +36,35 @@ namespace RuzinLines
                     return Color.Yellow;
                 default:
                     return Color.Red;
+            }
+        }
+
+        private void CreateNewBalls(EmptyCell prevCell)
+        {
+            EmptyCells.Remove(prevCell);
+            if (EmptyCells.Count >= 3)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    int newNumber = rnd.Next(EmptyCells.Count - 1);
+                    Ball newBall = new Ball(RandomColor(), new Point(EmptyCells[newNumber].StartPoint.X + 10, EmptyCells[newNumber].StartPoint.Y + 10));
+                    EmptyCells[newNumber].Ball = newBall;
+                    EmptyCells[newNumber].IsEmpty = false;
+                    Balls.Add(newBall);
+                    EmptyCells.RemoveAt(newNumber);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < EmptyCells.Count; i++)
+                {
+                    int newNumber = rnd.Next(EmptyCells.Count - 1);
+                    Ball newBall = new Ball(RandomColor(), new Point(EmptyCells[newNumber].StartPoint.X + 10, EmptyCells[newNumber].StartPoint.Y + 10));
+                    EmptyCells[newNumber].Ball = newBall;
+                    EmptyCells[newNumber].IsEmpty = false;
+                    Balls.Add(newBall);
+                    EmptyCells.RemoveAt(newNumber);
+                }
             }
         }
 
@@ -131,13 +161,14 @@ namespace RuzinLines
                         {
                             if (RuleChecking(Cells[i]))
                             {
+                                EmptyCells.Add(choosenCell);
                                 choosenBall.BallPoint = new Point(Cells[i].StartPoint.X + 10, Cells[i].StartPoint.Y + 10);
                                 Cells[i].Ball = choosenBall;
                                 choosenCell.DeleteCircle();
-                                choosenCell.CellColor = Color.Black;
+                                Cells[i].DrawCircle();
                                 choosenCell = null;
                                 choosenBall = null;
-                                Cells[i].DrawCircle();
+                                CreateNewBalls(Cells[i]);
                                 theBallIsChoosen = false;
                             }
                             else
@@ -148,18 +179,27 @@ namespace RuzinLines
                                 theBallIsChoosen = false;
                             }
                         }
-                        else {
-                            Ball newBall = new Ball(RandomColor(), new Point(Cells[i].StartPoint.X + 10, Cells[i].StartPoint.Y + 10));
-                            Cells[i].Ball = newBall;
-                            Balls.Add(newBall);
-                            Cells[i].DrawCircle();
-                        }
                         break;
                     }
                     else
                     {
                         if (!theBallIsChoosen)
                         {
+                            Ball clickedBall = Cells[i].Ball;
+                            for (int j = 0; j < Balls.Count; j++)
+                            {
+                                if ((Balls[j].BallPoint.X == clickedBall.BallPoint.X) && (Balls[j].BallPoint.Y == clickedBall.BallPoint.Y))
+                                {
+                                    choosenBall = Balls[j];
+                                    choosenCell = Cells[i];
+                                    theBallIsChoosen = true;
+                                    Cells[i].CellColor = Color.DarkGray;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            choosenCell.CellColor = Color.Black;
                             Ball clickedBall = Cells[i].Ball;
                             for (int j = 0; j < Balls.Count; j++)
                             {

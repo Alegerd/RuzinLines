@@ -37,6 +37,7 @@ namespace RuzinLines
 
         public void DeleteCircle()
         {
+             CellColor = Color.Black;
             _ball = null;
             _isEmpty = true;
         }
